@@ -1,0 +1,246 @@
+int trigPin = 13;
+int echoPin = 12;
+int score = 0;
+
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+
+int Read() {
+  int duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration / 2) / 29.41;
+  //Serial.print(distance);
+  //Serial.println(" cm");
+  return distance;
+  //Range 0-250
+}
+int Answer(int correct) {
+  int answer;
+  int distance = Read();
+  if (distance < 45) {
+    answer = 1;
+  }
+  else if (distance > 65 and distance < 105) {
+    answer = 2;
+  }
+  else if (distance > 120 and distance < 150) {
+    answer = 3;
+  }
+  else if (distance > 180 and distance < 230) {
+    answer = 4;
+  }
+  else {
+    Serial.println("YOU DID NOT ANSWER ON TIME");
+  }
+
+  //Serial.println(answer);
+  if (correct == answer) {
+    Serial.println("YOU ARE CORRECT!");
+    score++;
+  }
+  else {
+    Serial.println("BETTER LUCK NEXT TIME!");
+  }
+}
+
+
+void Time() {
+  Serial.println("5");
+  delay(1000);
+  Serial.println("4");
+  delay(1000);
+  Serial.println("3");
+  delay(1000);
+  Serial.println("2");
+  delay(1000);
+  Serial.println("1");
+  delay(1000);
+  Serial.println("!!!!TIME OUT!!!!");
+  delay(1000);
+}
+
+void Quiz() {
+  // put your main code here, to run repeatedly:
+  long distance = Read();
+  //Add on here
+  Serial.println("Welcome to SQUIZ GAME!!");
+  Serial.println("Instruction:");
+  Serial.println("1) Choose the correct answer");
+  Serial.println("GOOD LUCK!!");
+  delay(500);
+  Serial.println("Get Ready!!");
+  delay(500);
+  Serial.println("3");
+  delay(500);
+  Serial.println("2");
+  delay(500);
+  Serial.println("1");
+  delay(500);
+  // Conditions
+  Serial.println("1. Which building does MI room in?");
+  delay(3000);
+  Serial.println("A) roi pee");
+  Serial.println("B) building 1");
+  Serial.println("C) building 2");
+  Serial.println("D) building 3");
+  Time();
+  Answer(1);
+  Serial.println("The correct answer is A) roi pee");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("2. Who is the most handsome guy in Chula?");
+  delay(3000);
+  Serial.println("A) ajarn Surat");
+  Serial.println("B) Bunch");
+  Serial.println("C) Toon");
+  Serial.println("D) All of above");
+  Time();
+  Answer(4);
+  Serial.println("The correct answer is D) All of above");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("3. Which brand of water doesn’t sell in icanteen");
+  delay(3000);
+  Serial.println("A) singha");
+  Serial.println("B) montfleur");
+  Serial.println("C) crystal");
+  Serial.println("D) nestle");
+  Time();
+  Answer(1);
+  Serial.println("The correct answer is A) singha");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("4. How many girls are in AI04?");
+  delay(3000);
+  Serial.println("A) 9");
+  Serial.println("B) 10");
+  Serial.println("C) 11");
+  Serial.println("D) 12");
+  Time();
+  Answer(3);
+  Serial.println("The correct answer is C) 11");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("5. Which subject we did not study in year 1?");
+  delay(3000);
+  Serial.println("A) Calculus");
+  Serial.println("B) Chemistry");
+  Serial.println("C) Physics");
+  Serial.println("D) Computer Programming");
+  Time();
+  Answer(2);
+  Serial.println("The correct answer is B) Chemistry");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("6. Which province are not in northern Thailand?");
+  delay(3000);
+  Serial.println("A) Uttraradit (อุตรดิตถ์)");
+  Serial.println("B) Lumpoon (ลำพูน)");
+  Serial.println("C) Sukhothai (สุโขทัย)");
+  Serial.println("D) Prae (แพร่)");
+  Time();
+  Answer(3);
+  Serial.println("The correct answer is C) Sukhothai (สุโขทัย)");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("7. How many word “ช้าง” are in ช้าง song?");
+  delay(3000);
+  Serial.println("A) 10");
+  Serial.println("B) 9");
+  Serial.println("C) 7");
+  Serial.println("D) 5");
+  Time();
+  Answer(4);
+  Serial.println("The correct answer is D) 5");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("8. Which one is not a vegatable?");
+  delay(3000);
+  Serial.println("A) tomato");
+  Serial.println("B) broccoli");
+  Serial.println("C) cabbage");
+  Serial.println("D) chicken");
+  Time();
+  Answer(4);
+  Serial.println("The correct answer is D) chicken");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("9. what colour is not on Toon’s Glasses?");
+  delay(3000);
+  Serial.println("A) blue");
+  Serial.println("B) yellow");
+  Serial.println("C) black");
+  Serial.println("D) white");
+  Time();
+  Answer(1);
+  Serial.println("The correct answer is A) blue");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("10. How many question that has the answer “A”?");
+  delay(3000);
+  Serial.println("A) 1");
+  Serial.println("B) 2");
+  Serial.println("C) 3");
+  Serial.println("D) 4");
+  Time();
+  Answer(3);
+  Serial.println("The correct answer is C) 3");
+  delay(2000);
+  Serial.println("Get back to the starting point.");
+  delay(3000);
+
+  Serial.println("Your score is: ");
+  Serial.println(score);
+
+
+  //
+
+}
+void loop() {
+  int check = 0;
+  int distance = Read();
+  int start;
+  Serial.println("Please move to A to start the game");
+  if (distance > 0 and distance < 45) {
+    start = 1;
+  }
+  for (int i = 0; i <= 4; i++) {
+    if (start == 1) check++;
+    delay(1000);
+      
+  }
+
+  if (start == 1 and check == 5) {
+    Quiz();
+  }
+
+
+}
