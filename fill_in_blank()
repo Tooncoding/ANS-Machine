@@ -1,0 +1,101 @@
+void fill_in_blank(){
+   int score = 0;
+   show = 1;
+   Serial.println("Instructions: ");
+   delay(300);
+   Serial.println("Fill in the missing alphabet");
+   delay(300);
+   Serial.println("You have 2 seconds for each puzzle");
+   delay(300);
+   Serial.println("Pin_apple");
+   delay(300);
+   Serial.print("A) i          ");
+   Serial.println("B) e        ");
+   Serial.print("C) t          ");
+   Serial.println("D) d        ");
+  delay(2000);
+  if(SelectABCD() == 2){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Su_ermarket");
+  delay(500);
+  Serial.print("A) f         ");
+  Serial.println("B) p        ");
+  Serial.print("C) s          ");
+  Serial.println("D) b        ");
+delay(2000);
+  if(SelectABCD() == 2){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Billion_ire");
+  delay(500);
+  Serial.print("A) o          ");
+  Serial.println("B) e        ");
+  Serial.print("C) a          ");
+  Serial.println("D) f        ");
+delay(2000);
+  if(SelectABCD() == 3){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Mo_ntain");
+  delay(500);
+  Serial.print("A) e          ");
+  Serial.println("B) a        ");
+  Serial.print("C) u          ");
+  Serial.println("D) o        ");
+  delay(2000);
+  if(SelectABCD() == 3){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("De_tination");
+  delay(500);
+  Serial.print("A) s        ");
+  Serial.println("B) x      ");
+  Serial.print("C) p        ");
+  Serial.println("D) c      ");
+  delay(2000);
+  if(SelectABCD() == 1){
+    Serial.println("score +2");
+    score += 2;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Bonus one!");
+  delay(300);
+  Serial.println("E_gen va_ues");
+  delay(500);
+  Serial.print("A) u,g        ");
+  Serial.println("B) t,l      ");
+  Serial.print("C) r,n        ");
+  Serial.println("D) i,l      ");
+  delay(2000);
+  if(SelectABCD() == 4){
+    Serial.println("score +3");
+    score += 3;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Your score is ");
+  Serial.println(score); 
+  score = 0;
+  show = 0;
+ }
+ 
