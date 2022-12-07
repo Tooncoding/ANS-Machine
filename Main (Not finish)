@@ -1,21 +1,24 @@
 /*TABLE OF CONTENT
   // * 1. Chair detection (Ultrasonic_Underchair)
   // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
-  // * 3. Welcome sentence (LCD display)
+  // * 3. Welcome sentence (OLED display)
   // * 4. Time setting (Ultrasonic_Onthetable)
   // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
   // * 6. Fan (Motor driver)
   // * 7. Checkpoint game (Ultrasonic_Onthetable) (Discuss about loop with toon)
   // * 8. Vending Machine (Motor driver)
 */
-///////////////////////////////////////////////////////////////////////
-
-//Initialize the value for each function:
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//----------------------------------Initialize the value for each function:-------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
 
 
 // * 1. Chair detection (Ultrasonic_Underchair)
-int Chairdetection_TrigPin = ??;
-int Chairdetection_EchoPin = ??;
+int Chairdet_Ultra_TrigPin = ??;
+int Chairdet_Ultra_EchoPin = ??;
+
 // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
 #include <RBDdimmer.h>
 #define USE_SERIAL  Serial
@@ -23,7 +26,8 @@ int Chairdetection_EchoPin = ??;
 #define zerocross  0
 dimmerLamp dimmer(outputPin); //initialase port for dimmer for MEGA, Leonardo, UNO, Arduino M0, Arduino Zero
 int Intensity = 0;
-// * 3. Welcome sentence (LCD display)
+
+// * 3. Welcome sentence (OLED display)
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -40,11 +44,12 @@ int Intensity = 0;
 #define OLED_RESET 8
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
                          OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
-
 #define NUMFLAKES     10 // Number of snowflakes in the animation example
+
 // * 4. Time setting (Ultrasonic_Onthetable)
 int Onthetable_TrigPin = ??;
 int Onthetable_EchoPin = ??;
+
 // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
 #include "Arduino.h"
 #include "SoftwareSerial.h"
@@ -52,30 +57,40 @@ int Onthetable_EchoPin = ??;
 SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 void printDetail(uint8_t type, int value);
+
 // * 6. Fan (Motor driver - Port Left)
 int EN_FAN = ??;
 int IN1_FAN = ??;
 int IN2_FAN = ??;
+
 // * 7. Checkpoint game (Ultrasonic_Onthetable)
-int trigPin = ??;
-int echoPin = ??;
+int CheckPoint_Ultra_trigPin = ??;
+int CheckPoint_Ultra_echoPin = ??;
 int score = 0;
 int answer[8] = {1, 2, 1, 3, 3, 2, 4, 1};
+
 // * 8. Vending Machine (Motor driver - Port Right)
 int EN_VM = ??;
 int IN3_VM = ??;
 int IN4_VM = ??;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------Set up-------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
 
 void setup() {
-  // * 1. Chair detection (Ultrasonic_Underchair)
-  pinMode(Chairdetection_TrigPin, OUTPUT);
-  pinMode(Chairdetection_EchoPin, INPUT);
-  // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+  // * 1. Chair detection (Ultrasonic_Underchair)---------------------------------------------------------
+  pinMode(Chairdet_Ultra_TrigPin, OUTPUT);
+  pinMode(Chairdet_Ultra_EchoPin, INPUT);
+  
+  // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)----------------
   USE_SERIAL.begin(9600);
   dimmer.begin(NORMAL_MODE, ON); //dimmer initialisation: name.begin(MODE, STATE)
-  // * 3. Welcome sentence (LCD display)
+  
+  // * 3. Welcome sentence (OLED display)------------------------------------------------------------------
   //Screen setup
   Serial.begin(9600);
 
@@ -98,10 +113,14 @@ void setup() {
   display.println(" hi,");
   display.display();
   delay(5000);
-  // * 4. Time setting (Ultrasonic_Onthetable)
+
+  
+  // * 4. Time setting (Ultrasonic_Onthetable)---------------------------------------------------------------
   pinMode(Onthetable_TrigPin, OUTPUT);
   pinMode(Onthetable_EchoPin, INPUT);
-  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
+
+  
+  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)--------------------------------------------------
   mySoftwareSerial.begin(9600);
   Serial.begin(115200);
   if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.
@@ -174,27 +193,46 @@ void setup() {
   myDFPlayer.disableLoop(); //disable loop.
   delay(1000);
 
-  //----Read imformation----
+    //----Read imformation----
   Serial.println(myDFPlayer.readState()); //read mp3 state
   Serial.println(myDFPlayer.readVolume()); //read current volume
   Serial.println(myDFPlayer.readEQ()); //read EQ setting
   Serial.println(myDFPlayer.readFileCounts()); //read all file counts in SD card
   Serial.println(myDFPlayer.readCurrentFileNumber()); //read current play file number
   Serial.println(myDFPlayer.readFileCountsInFolder(3)); //read file counts in folder SD:/03
-  // * 6. Fan (Motor driver)
+  
+  // * 6. Fan (Motor driver)----------------------------------------------------------------------------------------------------
   pinMode(EN_FAN, OUTPUT);
   pinMode(IN1_FAN, OUTPUT);
   pinMode(IN2_FAN, OUTPUT);
-  // * 7. Checkpoint game (Ultrasonic_Onthetable)
+  
+  // * 7. Checkpoint game (Ultrasonic_Onthetable)--------------------------------------------------------------------------------
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   Serial.begin(9600);
+  
   // * 8. Vending Machine (Motor driver)
   pinMode(EN_VM, OUTPUT);
   pinMode(IN3_VM, OUTPUT);
   pinMode(IN4_VM, OUTPUT);
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//----------------------------------------------------Function--------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+/*TABLE OF CONTENT
+  // * 1. Chair detection (Ultrasonic_Underchair)
+  // * 2. Turn Light on/offs (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+  // * 3. Welcome sentence (OLED display) (Ultrasonic_Onthetable)
+  // * 4. Welcome sound 
+  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
+  // * 6. Fan (Motor driver)
+  // * 7. Checkpoint game (Ultrasonic_Onthetable) (Discuss about loop with toon)
+  // * 8. Vending Machine (Motor driver)
 
 /*TABLE FOR FUNCTION
    Light_on //Hardware
@@ -210,6 +248,52 @@ void setup() {
    void snack(float ReadingTime) ////Hardware
 */
 
+//********************************************************************************************************************//
+// * 1. Chair detection (Ultrasonic_Underchair)-----------------------------------------------------------------------//
+
+
+int Chair_det() {
+  long duration, distance, newdistance;
+  long tempo;
+  long limit = 20;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.41;
+  
+  while (true){
+    tempo = distance;
+//    Serial.print(tempo);
+//    Serial.println("tempo cm");
+    delay(500);
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    newdistance = (duration/2) / 29.41;
+//    Serial.print(newdistance);
+//    Serial.println("new cm");
+    
+    if (abs(newdistance-tempo) > limit){
+      Serial.println("Activate");
+      return 1;
+      
+      break;
+    }
+   }
+   Serial.println("----------");
+    
+}}
+
+
+//********************************************************************************************************************//
+// * 2. Light_on/Light_off
+
 void Light_on() {
   Intensity = map(650, 1, 1024, 100, 0); // analogRead(analog_pin), min_analog, max_analog, 100%, 0%);
   USE_SERIAL.println(Intensity);
@@ -220,451 +304,102 @@ void Light_off() {
   USE_SERIAL.println(Intensity);
   dimmer.setPower(Intensity); // 0%
 }
-void Music(int select_file) {
-  int Delay_Time = 0;
-  if (select_file == 1) {
-    Delay_Time = ??;
-  }
-  if (select_file == 2) {
-    Delay_Time = ??;
-  }
-  if (select_file == 3) {
-    Delay_Time = ??;
-  }
-  myDFPlayer.playMp3Folder(select_file);
-  delay(Delay_Time);
-}
-int Read() {
-  int duration, distance;
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration / 2) / 29.41;
-  //Serial.print(distance);
-  //Serial.println(" cm");
-  return distance;
-  //Range 0-250
-}
 
-int SelectABCD() {
-  int Answer ; //A=1, B=2, C=3 and D=4
-  delay(100);
-  boolean AlreadyAnswer = false;
-  while (AlreadyAnswer == false) {
-    int distance = Read();
-    int check1 = 0;
-    int check2 = 0;
-    int check3 = 0;
-    int check4 = 0;
-    delay(500);
-    for (int freeze1 = 0; freeze1 < 3; freeze1 ++) {
-      if (distance < 10) {
-        Answer = 1;
-        check1 += 1;
-      }
-      else if (distance > 10 and distance < 20) {
-        Answer = 2;
-        check2 += 1;
 
-      }
-      else if (distance > 20 and distance < 30) {
-        Answer = 3;
-        check3 += 1;
 
-      }
-      else if (distance > 30 and distance < 40) {
-        Answer = 4;
-        check4 += 1;
+//********************************************************************************************************************//
+// * 3. Welcome sentence (OLED display)
 
-      }
-      delay(300);
-    }
-    if (check1 == 3) {
-      Serial.println("A");
-      AlreadyAnswer = true;
-    }
-    else if (check2 == 3) {
-      Serial.println("B");
-      AlreadyAnswer = true;
-    }
-    else if (check3 == 3) {
-      Serial.println("C");
-      AlreadyAnswer = true;
-    }
-    else if (check4 == 3) {
-      Serial.println("D");
-      AlreadyAnswer = true;
-    }
-  }
-
-  return Answer;
-}
-int quickSelectABCD() {
-  int Answer ; //A=1, B=2, C=3 and D=4
-  delay(100);
-  boolean AlreadyAnswer = false;
-  while (AlreadyAnswer == false) {
-    int distance = Read();
-    int check1 = 0;
-    int check2 = 0;
-    int check3 = 0;
-    int check4 = 0;
-    delay(100);
-    for (int freeze1 = 0; freeze1 < 3; freeze1 ++) {
-      if (distance < 10) {
-        Answer = 1;
-        check1 += 1;
-      }
-      else if (distance > 10 and distance < 20) {
-        Answer = 2;
-        check2 += 1;
-
-      }
-      else if (distance > 20 and distance < 30) {
-        Answer = 3;
-        check3 += 1;
-
-      }
-      else if (distance > 30 and distance < 40) {
-        Answer = 4;
-        check4 += 1;
-
-      }
-      delay(50);
-    }
-    if (check1 == 3) {
-      Serial.println("A");
-      AlreadyAnswer = true;
-    }
-    else if (check2 == 3) {
-      Serial.println("B");
-      AlreadyAnswer = true;
-    }
-    else if (check3 == 3) {
-      Serial.println("C");
-      AlreadyAnswer = true;
-    }
-    else if (check4 == 3) {
-      Serial.println("D");
-      AlreadyAnswer = true;
-    }
-  }
-
-  return Answer;
-}
-void checkpoint() {
-  Serial.println("It's time to break");
-  Serial.println("Let's play a mini-game");
-  Crack_code();
-}
-void Crack_code() {
-  boolean pass = false;
-  Serial.println("Instructions:");
-  Serial.println("Crack the following code");
+void Welcome() {
+  // put your main code here, to run repeatedly:
+  long distance = Read();
+  //Add on here
+  display.println("Welcome to ANS!!");
+  display.display();
+  display.println("be prepare for the productive study");
+  display.display();
   delay(1000);
-  while (pass != true) {
-    Serial.println("ABACCBDA");
-    Serial.println("^       ");
-    int ans = SelectABCD();
-    if (ans == 1) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println(" BACCBDA");
-  Serial.println(" ^      ");
-  while (pass != true) {
-    if (SelectABCD() == answer[1]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println("  ACCBDA");
-  Serial.println("  ^     ");
-  while (pass != true) {
-    if (SelectABCD() == answer[2]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println("   CCBDA");
-  Serial.println("   ^     ");
-  while (pass != true) {
-    if (SelectABCD() == answer[3]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println("    CBDA");
-  Serial.println("    ^   ");
-  while (pass != true) {
-    if (SelectABCD() == answer[4]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  while (pass != true) {
-    Serial.println("     BDA");
-    Serial.println("     ^  ");
-    if (SelectABCD() == answer[5]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println("      DA");
-  Serial.println("      ^ ");
-  while (pass != true) {
+  display.clearDisplay();
+  
 
-    if (SelectABCD() == answer[6]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  pass = false;
-  Serial.println("        A");
-  Serial.println("        ^");
-  while (pass != true) {
-    if (SelectABCD() == answer[7]) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try Again");
-    }
-  }
-  if (pass == true) {
-    Serial.println("Congratulations! You win!!!");
-  }
-}
-void swipe() {
-  int check = 0;
-  int check2 = 0;
-  int pass = false;
-  int v_avg;
-  int v_avg2;
-  int v_avg3;
-  int start_dis;
-  int end_dis;
-  int ttime1;
-  int ttime2;
-  int ttime3;
-  int ttime4;
-  int ttime5;
-  int ttime6;
-  //check variable at every point
-  Serial.println("Instructions:");
-  Serial.println("Swipe your hand");
-  Serial.println("From A to D");
+  delay(700);
+  display.setCursor(0, 0);
+  display.println("Instructions:");
+  display.println("");
+  display.display();
   delay(500);
-  ttime1 = millis();
-  while (quickSelectABCD() != 4) {
-    if (quickSelectABCD() == 1) {
-      check = 1;
-    }
-  }
-  ttime2 = millis();
-  delay(300);
-  v_avg = 30 / ((ttime2 - ttime1) * 0.001);
-  Serial.println(ttime1);
-  Serial.println(ttime2);
-  Serial.println((v_avg) * 10);
-  if (check == 1 and v_avg * 10 >= 100) {
-    pass = true;
-  }
-  else {
-    check = 0;
-    Serial.println("Try again");
-  }
-  if (pass == true) {
-    pass = false ;
-    Serial.println("Great!");
-    delay(500);
-    Serial.println("Level UP >>>");
-    delay(300);
-    Serial.println("Swipe your hand");
-    Serial.println("From A to D");
-    delay(300);
-    Serial.println("Faster");
-    ttime3 = millis();
-    while (quickSelectABCD() != 4) {
-      if (quickSelectABCD() == 1) {
-        check = 1;
-      }
-    }
-    ttime4 = millis();
+  display.println("Move your hand to the zone for 3s to select your choice");
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  display.display();
 
-    v_avg2 = 30 / ((ttime4 - ttime3) * 0.001);
-    if (check == 1 and v_avg2 * 10 >= 120) {
-      pass = true;
-    }
-    else {
-      Serial.println("Try again");
-    }
-    if (pass == true) {
-      pass = false;
-      Serial.println("Great!");
-      delay(500);
-      Serial.println("Level UP >>>>>>>>>>>>>");
-      delay(300);
-      Serial.println("Last level !!!");
-      Serial.println("Swipe your hand");
-      Serial.println("From A to D");
-      delay(300);
-      Serial.println("More fasterrrrrrrrrrrr");
-      ttime5 = millis();
-      while (quickSelectABCD() != 4) {
-        if (quickSelectABCD() == 1) {
-          check = 1;
-        }
-      }
-      ttime6 = millis();
+  //conditions
+  display.setCursor(0, 0);
+  display.println("Are you ready ?");
+  display.display();
+  delay(3000);
+  display.println("A) yes");
+  display.println("C) no");
+  display.display();
+  SelectYN();
+  delay(3000);
 
-      v_avg3 = 30 / ((ttime6 - ttime5) * 0.001);
-      if (check == 1 and v_avg3 * 10 >= 150) {
-        pass = true;
-      }
-      else {
-        Serial.println("Try again");
-      }
-      if (pass == true) {
-        pass = false;
-        Serial.println("Congratulations, You are super fast !");
-      }
-    }
-  }
-}
-void fill_in_blank() {
-  int score = 0;
-  Serial.println("Instructions: ");
-  delay(300);
-  Serial.println("Fill in the missing alphabet");
-  delay(300);
-  Serial.println("You have 2 seconds for each puzzle");
-  delay(300);
-  Serial.println("Pin_apple");
-  delay(300);
-  Serial.print("A) i          ");
-  Serial.println("B) e        ");
-  Serial.print("C) t          ");
-  Serial.println("D) d        ");
-  delay(2000);
-  if (SelectABCD() == 2) {
-    Serial.println("score +1");
-    score += 1;
-  }
-  Serial.println("Su_ermarket");
-  delay(500);
-  Serial.print("A) f         ");
-  Serial.println("B) p        ");
-  Serial.print("C) s          ");
-  Serial.println("D) b        ");
-  delay(2000);
-  if (SelectABCD() == 2) {
-    Serial.println("score +1");
-    score += 1;
-  }
-  Serial.println("Billion_ire");
-  delay(500);
-  Serial.print("A) o          ");
-  Serial.println("B) e        ");
-  Serial.print("C) a          ");
-  Serial.println("D) f        ");
-  delay(2000);
-  if (SelectABCD() == 3) {
-    Serial.println("score +1");
-    score += 1;
-  }
-  Serial.println("Mo_ntain");
-  delay(500);
-  Serial.print("A)e          ");
-  Serial.println("B) a        ");
-  Serial.print("C) u          ");
-  Serial.println("D) o        ");
-  delay(2000);
-  if (SelectABCD() == 3) {
-    Serial.println("score +1");
-    score += 1;
-  }
-  Serial.println("De_tination");
-  delay(500);
-  Serial.print("A) s        ");
-  Serial.println("B) x      ");
-  Serial.print("C) p        ");
-  Serial.println("D) c      ");
-  delay(2000);
-  if (SelectABCD() == 1) {
-    Serial.println("score +2");
-    score += 2;
-  }
-  Serial.println("Bonus one!");
-  delay(300);
-  Serial.println("E_gen va_ues");
-  delay(500);
-  Serial.print("A) u,g        ");
-  Serial.println("B) t,l      ");
-  Serial.print("C) r,n        ");
-  Serial.println("D) i,l      ");
-  delay(2000);
-  if (SelectABCD() == 4) {
-    Serial.println("score +3");
-    score += 3;
-  }
-  Serial.println("Your score is ");
-  Serial.println(score);
-  score = 0;
-}
-
-void snack(float ReadingTime) {
-  float Time = ReadingTime;
-  if (Time >= 30) {
-    // set direction - forward
-    digitalWrite(IN1, HIGH);
-    digitalWrite(IN2, LOW);
-    // speed control – full speed
-    analogWrite(ENA, 60);
-    delay(50000);//We still need to find the specific time for 1 loop
-    digitalWrite(IN1, LOW);
-    digitalWrite(IN2, LOW);
-  }
-
-  if (Time >= 60) {
-    // set direction - forward
-    digitalWrite(IN3, HIGH);
-    digitalWrite(IN4, LOW);
-    // speed control – full speed
-    analogWrite(ENB, 254);
-    delay(1000); //We still need to find the specific time for 1 loop
-    digitalWrite(IN3, LOW);
-    digitalWrite(IN4, LOW);
-  }
-}
+  //conditions
+  display.clearDisplay();
+  display.display();
+  delay(3000);
+  display.setCursor(0, 0);
+  display.println("Choose your study time :");
+  display.display();
+  delay(3000);
+  display.println("A) 0.5 hrs");
+  display.println("B) 1.0 hrs");
+  display.println("C) 1.5 hrs");
+  display.println("D) 2.0 hrs");
+  display.display();
+  SelectABCD();
+  delay(3000);
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------Main----------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+
+
 
 void loop() {
+  
+int activate = Chair_det(); //detect chair
+
+if (activate ==1){
+  Light_on();  //turn on light
+  Welcome();   //welcome massage
+  
+  
+}
+
+
+
+
+
+
+
+//********************************************************************************************************************//
+// * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+
+
+//********************************************************************************************************************//
+// * 3. Welcome sentence (OLED display)
+
+
+
+
+
 
 
 }
