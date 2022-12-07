@@ -1,0 +1,61 @@
+int quickSelectABCD() {
+  int Answer ; //A=1, B=2, C=3 and D=4
+  delay(100);
+  boolean AlreadyAnswer = false;
+  while (AlreadyAnswer == false) {
+    int distance = Read();
+    int check1 = 0;
+    int check2 = 0;
+    int check3 = 0;
+    int check4 = 0;
+    delay(100);
+    for(int freeze1 = 0; freeze1 < 3; freeze1 ++){
+      if (distance < 10) {
+        Answer = 1;
+        check1 += 1;
+      }
+      else if (distance > 10 and distance < 20) {
+        Answer = 2;
+        check2 += 1;
+  
+      }
+      else if (distance > 20 and distance < 30) {
+        Answer = 3;
+        check3 += 1;
+  
+      }
+      else if (distance > 30 and distance < 40) {
+        Answer = 4;
+        check4 += 1;
+  
+      }
+      delay(50);
+    }
+    if(check1 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+       Serial.println("A");
+       }
+    }
+    else if (check2 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+       Serial.println("B");
+       }
+    }
+    else if (check3 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+      Serial.println("C");
+    }
+    }
+    else if (check4 == 3){ 
+      AlreadyAnswer = true;
+       if (show == 1){
+      Serial.println("D");
+    }
+  }
+
+  return Answer;
+}
+}
