@@ -1,0 +1,99 @@
+void Crack_code(){
+  boolean pass = false;
+  Serial.println("Instructions:");
+  Serial.println("Crack the following code");
+  delay(1000);
+  while (pass != true) {
+    Serial.println("ABACCBDA");
+    Serial.println("^       ");
+    int ans = SelectABCD();
+    if(ans == 1){
+      pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(" BACCBDA");
+  Serial.println(" ^      ");
+  while (pass != true) {
+    if(SelectABCD() == answer[1]){
+      pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println("  ACCBDA");
+  Serial.println("  ^     ");
+  while (pass != true) {
+   if(SelectABCD() == answer[2]){
+     pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println("   CCBDA");
+  Serial.println("   ^     ");
+  while (pass != true) {
+   if(SelectABCD() == answer[3]){
+     pass = true;
+  }
+    else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println("    CBDA");
+  Serial.println("    ^   ");
+  while (pass != true) {
+   if(SelectABCD() == answer[4]){
+     pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  while (pass != true) {
+   Serial.println("     BDA");
+   Serial.println("     ^  ");
+   if(SelectABCD() == answer[5]){
+    pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println("      DA");
+  Serial.println("      ^ ");
+  while (pass != true) {
+   
+   if(SelectABCD() == answer[6]){
+    pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println("        A");
+  Serial.println("        ^");
+  while (pass != true) {
+   if(SelectABCD() == answer[7]){
+    pass = true;
+  }
+  else{
+    Serial.println("Try Again");
+  }
+  }
+if (pass == true) {
+  Serial.println("Congratulations! You win!!!");
+}
+  show = 0;
+}
