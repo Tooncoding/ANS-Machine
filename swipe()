@@ -1,0 +1,101 @@
+void swipe(){
+  int check = 0;
+  int check2 = 0;
+  int pass = false;
+  int v_avg;
+  int v_avg2;
+  int v_avg3;
+  int start_dis;
+  int end_dis;
+  int ttime1;
+  int ttime2;
+  int ttime3;
+  int ttime4;
+  int ttime5;
+  int ttime6;
+  //check variable at every point
+  Serial.println("Instructions:");
+  Serial.println("Swipe your hand");
+  Serial.println("From A to D");
+  delay(500);
+  ttime1 = millis();
+  while (quickSelectABCD() != 4) {
+    if(quickSelectABCD() == 1){
+      check = 1;
+  } 
+  }
+  ttime2 = millis();
+  delay(300);
+  v_avg = 30/((ttime2-ttime1)*0.001);
+  //For checking the accuray of the game
+  //Serial.println(ttime1);
+  // Serial.println(ttime2);
+  //Serial.println((v_avg)*10);
+  //Serial.println(check);
+  if(check == 1 and v_avg*10 >= 100){
+    pass = true;
+  }
+  else{
+    check = 0;
+    Serial.println("Try again");
+    }
+  if(pass == true){
+    pass = false ;
+    Serial.println("Great!");
+    delay(500);
+    Serial.println("Level UP >>>");
+    delay(300);
+    Serial.println("Swipe your hand");
+    Serial.println("From A to D");
+    delay(300);
+    Serial.println("Faster");
+    ttime3 = millis();
+    check = 0;
+    while (quickSelectABCD() !=4) {
+    if(quickSelectABCD() == 1){
+      check = 1;
+    } 
+    }
+    ttime4 = millis();
+    v_avg2 = 30/((ttime4-ttime3)*0.001);
+    if(check == 1 and v_avg2*10 >= 120){
+      pass = true;
+  }
+    else {
+      Serial.println("Try again");
+    }
+    if(pass == true){
+      pass = false;
+      Serial.println("Great!");
+      delay(500);
+      Serial.println("Level UP >>>>>>>>>>>>>");
+      delay(300);
+      Serial.println("Last level !!!");
+      Serial.println("Swipe your hand");
+      Serial.println("From A to D");
+      delay(300);
+      Serial.println("More fasterrrrrrrrrrrr");
+      check =0;
+      ttime5 = millis();
+      while (quickSelectABCD() !=4) {
+      if(quickSelectABCD() == 1){
+        check = 1;
+      } 
+      }
+      ttime6 = millis();
+      
+      v_avg3 = 30/((ttime6-ttime5)*0.001);
+      if(check == 1 and v_avg3*10 >= 150){
+         pass = true;
+      }
+      else {
+      Serial.println("Try again");
+    }
+      if(pass == true){
+        pass = false;
+        Serial.println("Congratulations, You are super fast !");
+    }
+      }
+}
+  show = 0;
+}
