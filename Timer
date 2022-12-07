@@ -1,0 +1,57 @@
+
+#include <RTClib.h>
+#include <Wire.h>
+#include <TimeLib.h>
+
+RTC_DS1307 RTC;
+ 
+unsigned long LastUnSyncTime = 0;
+
+time_t time_provider()
+{
+    return RTC.now().unixtime();  
+}
+
+
+void setup() {
+Serial.begin(9600);
+Wire.begin();  //sets up the I2C
+RTC.begin();   //initializes the I2C to the RTC
+
+//  Set the RTC Time to 5:10:30 Nov 3 2020
+RTC.adjust(DateTime(2020,11,3,0,00,00));
+}
+
+void timer(int hour_chosen, int min_chosen, int sec_chosen) {
+
+  while (true) {
+    DateTime now = RTC.now();  //  Creating now object every loop?
+   
+    int hour_now = now.hour();
+    int min_now = now.minute();
+    int sec_now = now.second();
+    
+    //Print RTC time
+    Serial.println("----------");
+    Serial.print("now.hour:   ");
+    Serial.println(hour_now);
+    Serial.print("now.minute: ");
+    Serial.println(min_now);
+    Serial.print("now.second: ");
+    Serial.println(sec_now);
+
+    delay(2000);
+    
+  
+    if (hour_chosen == hour_now and min_chosen == min_now and sec_chosen == sec_now){
+      Serial.println("It's been 30 minutes");
+      Serial.println("You made it to the first check point !");
+      RTC.adjust(DateTime(2020,11,3,0,00,00));
+      break;
+  
+    
+    }}}
+
+void loop() {
+  timer(0,0,10);
+}
