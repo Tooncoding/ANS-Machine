@@ -1,0 +1,15 @@
+void checkpoint(){
+  int r_game = TrueRandom.random(1,4);
+  Serial.println(r_game);
+  Serial.println("It's time to break");
+  Serial.println("Let's play a mini-game");
+  if(r_game == 1){
+    Crack_code();
+  }
+  if(r_game == 2){
+    swipe();
+  }
+  if(r_game == 3){
+    fill_in_blank();
+}
+}
