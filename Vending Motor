@@ -1,0 +1,65 @@
+int ENA = 11;
+int IN1 = 10;
+int IN2 = 9;
+const int trigPin = 13;
+const int echoPin = 12;
+
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(ENA, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+void snack() {
+    // set direction - forward
+    digitalWrite(IN1, HIGH);
+    digitalWrite(IN2, LOW);
+    // speed control – full speed
+    analogWrite(ENA, 60);
+  
+}
+
+void loop() {
+  delay(2000);
+  snack();
+  delay(2000);
+  long duration, distance, newdistance;
+  long tempo;
+  long limit = 2;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration/2) / 29.41;
+  while (true){
+    tempo = distance;
+    Serial.print(tempo);
+    Serial.println("tempo cm");
+    delay(500);
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+    duration = pulseIn(echoPin, HIGH);
+    newdistance = (duration/2) / 29.41;
+    Serial.print(newdistance);
+    Serial.println("new cm");
+    
+    if ((abs(newdistance-tempo) > limit) || (abs(newdistance-tempo) == limit)) {
+      Serial.println("Activate");
+      while (true) {
+        digitalWrite(IN1, LOW);
+        digitalWrite(IN2, LOW);
+      }
+    }
+   }
+   Serial.println("----------");
+
+}
