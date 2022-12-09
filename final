@@ -1,0 +1,1089 @@
+
+/*TABLE OF CONTENT
+  // * 1. Chair detection (Ultrasonic_Underchair)
+  // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+  // * 3. Welcome sentence (OLED display)
+  // * 4. Timer (RTC)
+  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
+  // * 6. Fan (Motor driver)
+  // * 7. Checkpoint game (Ultrasonic_Onthetable) (Discuss about loop with toon)
+  // * 8. Vending Machine (Motor driver)
+*/
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//----------------------------------Initialize the value for each function:-------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+
+// * 1. Chair detection (Ultrasonic_Underchair)
+int ChairDet_trigPin = 47;
+int ChairDet_echoPin = 49;
+
+/*
+// * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+#include <RBDdimmer.h>
+#define USE_SERIAL  Serial
+#define outputPin  0
+#define zerocross  0
+dimmerLamp dimmer(outputPin); //initialase port for dimmer for MEGA, Leonardo, UNO, Arduino M0, Arduino Zero
+int Intensity = 0;
+*/
+
+// * 3. Welcome sentence (OLED display)
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+
+// Declaration for SSD1306 display connected using software SPI (default case):
+#define OLED_MOSI   24
+#define OLED_CLK   22
+#define OLED_DC    28
+#define OLED_CS    30
+#define OLED_RESET 26
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT,
+                         OLED_MOSI, OLED_CLK, OLED_DC, OLED_RESET, OLED_CS);
+#define NUMFLAKES     10 // Number of snowflakes in the animation example
+
+// * 4. Timer (URTC)
+#include <RTClib.h>
+#include <Wire.h>
+#include <TimeLib.h>
+int set_hour = 0;
+int set_minute = 0;
+int set_sec = 0;
+int call = 0;
+RTC_DS1307 RTC;
+ 
+unsigned long LastUnSyncTime = 0;
+
+time_t time_provider()
+{
+    return RTC.now().unixtime();  
+}
+
+
+//
+//// * 5. Music Selector (DFPlayer Mini MP3 Player Module)
+//
+//#include "Arduino.h"
+//#include "SoftwareSerial.h"
+////#include "DFRobotDFPlayerMini.h"
+//
+//SoftwareSerial mySoftwareSerial(2, 3); // TX , RX
+//DFRobotDFPlayerMini myDFPlayer;
+
+/*
+// * 6. Fan (Motor driver - Port Left)
+int EN_FAN = ??;
+int IN1_FAN = ??;
+int IN2_FAN = ??;*/
+
+// * 7. Checkpoint game (Ultrasonic_Onthetable)
+#include <TrueRandom.h>
+int CheckPoint_trigPin = 33;
+int CheckPoint_echoPin = 31;
+int score = 0;
+int answer[8] = {1,2,1,3,3,2,4,1};
+String code[8] = {"ABACCBDA"," BACCBDA","  ACCBDA","   CCBDA","    CBDA","     BDA","      DA","       A"};
+String pointer[8] = {"^       "," ^      ","  ^     ","   ^    ","    ^   ","     ^  ","      ^ ","       ^"};
+int show = 0;
+
+/*
+// * 8. Vending Machine (Motor driver - Port Right)
+int EN_VM = ??;
+int IN3_VM = ??;
+int IN4_VM = ??;
+*/
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//-------------------------------------------------------Set up-------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+void setup() {
+  
+  // * 1. Chair detection (Ultrasonic_Underchair)---------------------------------------------------------
+  pinMode(ChairDet_trigPin, OUTPUT);
+  pinMode(ChairDet_echoPin, INPUT);
+
+  /*
+  // * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)----------------
+  USE_SERIAL.begin(9600);
+  dimmer.begin(NORMAL_MODE, ON); //dimmer initialisation: name.begin(MODE, STATE)
+  */
+  
+  // * 3. Welcome sentence (OLED display)------------------------------------------------------------------
+  //Screen setup
+  Serial.begin(9600);
+
+  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  if (!display.begin(SSD1306_SWITCHCAPVCC)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;); // Don't proceed, loop forever
+  }
+
+  delay(2000);
+  display.clearDisplay();
+
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 10);
+  // Display static text
+  delay(5000);
+  display.clearDisplay();
+
+  display.println(" hi,");
+  display.display();
+  delay(5000);
+
+  
+  // * 4. Timer (RTC)---------------------------------------------------------------
+  Serial.begin(9600);
+  Wire.begin();  //sets up the I2C
+  RTC.begin();   //initializes the I2C to the RTC
+  
+  //  Set the RTC Time to 5:10:30 Nov 3 2020
+  RTC.adjust(DateTime(2020,12,3,0,00,00));
+
+//
+//  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)--------------------------------------------------
+//  
+//  mySoftwareSerial.begin(9600);
+//  if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.
+//    while(true);
+//  }
+//  
+//  myDFPlayer.setTimeOut(500); //Set serial communictaion time out 500ms
+//  
+//  //----Set volume----
+//  myDFPlayer.volume(15);  //Set volume value (0~30).
+//  myDFPlayer.volumeUp(); //Volume Up
+//  myDFPlayer.volumeDown(); //Volume Down
+//  
+//  //----Set different EQ----
+//  myDFPlayer.EQ(DFPLAYER_EQ_NORMAL);
+//
+//  myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
+
+  /*
+  // * 6. Fan (Motor driver)----------------------------------------------------------------------------------------------------
+  pinMode(EN_FAN, OUTPUT);
+  pinMode(IN1_FAN, OUTPUT);
+  pinMode(IN2_FAN, OUTPUT);
+  */
+  
+  // * 7. Checkpoint game (Ultrasonic_Onthetable)--------------------------------------------------------------------------------
+  pinMode(CheckPoint_trigPin, OUTPUT);
+  pinMode(CheckPoint_echoPin, INPUT);
+  Serial.begin(9600);
+
+  /*
+  // * 8. Vending Machine (Motor driver)
+  pinMode(EN_VM, OUTPUT);
+  pinMode(IN3_VM, OUTPUT);
+  pinMode(IN4_VM, OUTPUT);
+  */
+}
+
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//----------------------------------------------------Function--------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+/*TABLE OF CONTENT
+ * General function
+  // * a. Selection Code 
+            --> SelectYN()
+            --> SelectABCD()
+            --> quickSelect()
+  // * b. Read() : Ultrasonic sensor
+  // * 1. Chair detection (Ultrasonic_Underchair)
+  // * 2. Turn Light on/offs (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+  // * 3. Welcome sentence (OLED display) (Ultrasonic)
+  // * 4. Timer
+  // * 5. Music Selector (DFPlayer Mini MP3 Player Module)
+  // * 6. Fan (Motor driver)
+  // * 7. Checkpoint game (Ultrasonic_Onthetable)
+            --> CrackCode()
+            --> Swipe()
+            --> FillInBlank()
+  // * 8. Vending Machine (Motor driver)
+
+
+/*TABLE FOR FUNCTION
+   Light_on //Hardware
+   Light_off //Hardware
+   Music //Hardware
+   int Read() //Hardware
+   int SelectABCD() 
+   int quickSelectABCD() 
+   void checkpoint()
+   void Crack_code()
+   void swipe()
+   void fill_in_blank()
+   void snack(float ReadingTime) ////Hardware
+*/
+//------------------------------------General Function-----------------------------------//
+//********************************************************************************************************************//
+// * a. Selection Code 
+
+
+int SelectABCD() {
+  int Answer ; //A=1, B=2, C=3 and D=4
+  delay(100);
+  boolean AlreadyAnswer = false;
+  while (AlreadyAnswer == false) {
+    int distance = Read(CheckPoint_trigPin, CheckPoint_echoPin);
+    int check1 = 0;
+    int check2 = 0;
+    int check3 = 0;
+    int check4 = 0;
+    delay(500);
+    for(int freeze1 = 0; freeze1 < 3; freeze1 ++){
+      if (distance < 10) {
+        Answer = 1;
+        check1 += 1;    }
+      else if (distance > 10 and distance < 20) {
+        Answer = 2;
+        check2 += 1;    }
+      else if (distance > 20 and distance < 30) {
+        Answer = 3;
+        check3 += 1;    }
+      else if (distance > 30 and distance < 40) {
+        Answer = 4;
+        check4 += 1;    }
+      delay(500);   
+      }
+    
+    if(check1 == 3){
+      display.println(F("A"));
+      display.display();
+      AlreadyAnswer = true;   }
+    else if (check2 == 3){
+      display.println(F("B"));
+      display.display();
+      AlreadyAnswer = true;   }
+    else if (check3 == 3){
+      display.println(F("C"));
+      display.display();
+      AlreadyAnswer = true;   }
+    else if (check4 == 3){
+      display.println(F("D"));
+      display.display();
+      AlreadyAnswer = true;   }
+  }
+
+  return Answer;    }
+
+/*
+int Sure() {
+  display.println(F("Are you sure ?"));
+  display.display();
+  delay(3000);
+  display.println(F("A) yes"));
+  display.println(F("C) no"));
+  display.display();
+  int Answer ; //Yes=1, No=0
+  boolean AlreadyAnswer = false;
+  int check1 = 0;
+  int check2 = 0;
+  while (AlreadyAnswer == false) {
+    int distance = Read();
+    // for loop is used to make sure users want to select that choice
+    for(int freeze = 0; freeze < 3; freeze ++){
+      if (distance < 20) {
+        Answer = 1;//YES
+        check1 += 1;      }
+      else if (distance > 20 and distance < 40) {
+        Answer = 0;//NO
+        check2 += 1;      }
+    delay(800);   }
+    
+    if(check1 == 3){
+      display.println(F("YES"));
+      display.display();
+      delay(1000);
+      display.clearDisplay();
+      display.display();
+      display.setCursor(0, 10);
+      display.println(F("Good Bye ;-;"));
+      display.display();
+      AlreadyAnswer = true;
+    }
+    else if(check2 == 3){
+      display.println(F("NO"));
+      display.display();
+      delay(500);
+      Sure();
+      AlreadyAnswer = true;
+    }
+  }}
+
+*/
+
+int SelectYN() {
+  int Answer ; //Yes=1, No=0
+  boolean AlreadyAnswer = false;
+  int check1 = 0;
+  int check2 = 0;
+  while (AlreadyAnswer == false) {
+    int distance = Read(CheckPoint_trigPin, CheckPoint_echoPin);
+    // for loop is used to make sure users want to select that choice
+    for(int freeze = 0; freeze < 3; freeze ++){
+      if (distance < 20) {
+        Answer = 1;//YES
+        check1 += 1;      }
+      else if (distance > 20 and distance < 40) {
+        Answer = 0;//NO
+        check2 += 1;      }
+    delay(500);
+    }
+    if(check1 == 3){
+      display.println(F("YES"));
+      display.display();
+      AlreadyAnswer = true;   }
+    else if(check2 == 3){
+      display.println(F("NO"));
+      display.display();
+      delay(500);
+//      Sure();
+      AlreadyAnswer = true;
+    }
+  }
+  return Answer;    }
+
+int quickSelectABCD() {
+  int Answer ; //A=1, B=2, C=3 and D=4
+  delay(100);
+  boolean AlreadyAnswer = false;
+  while (AlreadyAnswer == false) {
+    int distance = Read(CheckPoint_trigPin, CheckPoint_echoPin);
+    int check1 = 0;
+    int check2 = 0;
+    int check3 = 0;
+    int check4 = 0;
+    delay(100);
+    for(int freeze1 = 0; freeze1 < 3; freeze1 ++){
+      if (distance < 10) {
+        Answer = 1;
+        check1 += 1;   }
+      else if (distance > 10 and distance < 20) {
+        Answer = 2;
+        check2 += 1;   }
+      else if (distance > 20 and distance < 30) {
+        Answer = 3;
+        check3 += 1;   }
+      else if (distance > 30 and distance < 40) {
+        Answer = 4;
+        check4 += 1;   }
+      delay(50);   }
+      
+    if(check1 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+       Serial.println("A");    }}
+    else if (check2 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+       Serial.println("B");   }}
+    else if (check3 == 3){
+      AlreadyAnswer = true;
+       if (show == 1){
+      Serial.println("C");    }}
+    else if (check4 == 3){ 
+      AlreadyAnswer = true;
+       if (show == 1){
+      Serial.println("D");    }}
+
+  return Answer;
+}
+}
+
+
+
+
+//********************************************************************************************************************//
+// * a. Read (Utrasonic)
+
+int Read(int trigPin, int echoPin) {
+  int duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration / 2) / 29.41;
+//  Serial.print(distance);
+//  Serial.println(" cm");
+  return distance;
+  //Range 0-250
+}
+
+
+//---------------------------------------------Defined Function--------------------------------------------//
+//*********************************************************************************************************//
+// * 1. Chair detection (Ultrasonic)-----------------------------------------------------------------------//
+
+int Chair_det(int ChairDet_trigPin, int ChairDet_echoPin) {
+  int distance = Read(ChairDet_trigPin, ChairDet_echoPin);
+  int tempo;
+  int limit = 5;
+  
+  while (true){
+    tempo = distance;
+    delay(500);
+    distance = Read(ChairDet_trigPin, ChairDet_echoPin);
+    if (abs(distance-tempo) > limit){
+      Serial.println("Activate");
+      return 1;
+      break;
+    }}}
+
+
+//********************************************************************************************************************//
+// * 2. Light_on/Light_off
+
+/*
+void Light_on() {
+  Intensity = map(650, 1, 1024, 100, 0); // analogRead(analog_pin), min_analog, max_analog, 100%, 0%);
+  USE_SERIAL.println(Intensity);
+  dimmer.setPower(Intensity); // 100%
+}
+void Light_off() {
+  Intensity = map(0, 1, 1024, 100, 0); // analogRead(analog_pin), min_analog, max_analog, 100%, 0%);
+  USE_SERIAL.println(Intensity);
+  dimmer.setPower(Intensity); // 0%
+}
+*/
+
+
+//********************************************************************************************************************//
+// * 3. Welcome sentence (OLED display)
+
+
+int Welcome() {
+
+  display.setCursor(0, 0);
+  display.clearDisplay();
+  display.println(F("Welcome to ANS!!"));
+  display.display();
+  delay(1000);
+  display.println(F("be prepare for the productive study"));
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  
+  display.setCursor(0, 0);
+  display.println(F("Instructions:"));
+  display.println(F(""));
+  display.display();
+  delay(1000);
+  display.println(F("Move your hand to the zone for 3s to select your choice"));
+  display.display();
+  delay(3000);
+  display.clearDisplay();
+  display.display();
+
+  //conditions
+  display.setCursor(0, 0);
+  display.println(F("Are you ready ?"));
+  display.display();
+  delay(1000);
+  display.println(F("A) yes"));
+  display.println(F("C) no"));
+  display.display();
+  delay(500);
+  SelectYN();
+  delay(3000);
+
+  //conditions
+  display.clearDisplay();
+  display.display();
+
+  display.setCursor(0, 0);
+  display.println(F("Choose your study time :"));
+  display.display();
+  delay(1000);
+  display.println(F("A) 1.0 hrs"));
+  display.println(F("B) 2.0 hrs"));
+  display.println(F("C) 3.0 hrs"));
+  display.println(F("D) 10 mins"));
+  display.display();
+  delay(500);
+  int StudyTime = SelectABCD(); //1=A=10 mins //2=B=1.0hrs //3=C=2.0 hrs //4=D=3.0 hrs
+  delay(4000);
+  return StudyTime;
+
+}
+
+
+//********************************************************************************************************************//
+// * 4. Timer (RTC)
+
+
+void timer(int hour_chosen, int min_chosen, int sec_chosen) {
+  //printchosen time
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println(F("The schosen time is :"));
+  display.println(F(""));
+  display.display();
+  display.print(hour_chosen);
+  display.println(F(" hrs, "));
+  display.print(min_chosen);
+  display.println(F(" mins, "));
+  display.println(sec_chosen);
+  display.println(F(" sec"));
+  display.display();
+  delay(4000);
+
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println(F("study session start"));
+  display.println(F("in..."));
+  display.display();
+  delay(2000);
+  display.println(F("3"));
+  display.display();
+  delay(1000);
+  display.println(F("2"));
+  display.display();
+  delay(1000);
+  display.print(F("1"));
+  display.display();
+  delay(1000);
+  display.clearDisplay();
+  display.setCursor(0, 10);
+  display.println(F("fighting ngub <3"));
+  display.display();
+  delay(5000);
+  display.clearDisplay();
+  
+  RTC.adjust(DateTime(2020,12,3,0,00,00));
+  
+  while (true) {
+    DateTime now = RTC.now();  //  Creating now object every loop?
+   
+    int hour_now = now.hour();
+    int min_now = now.minute();
+    int sec_now = now.second();
+    
+    //Print RTC time
+    Serial.println("----------");
+    Serial.print("now.hour:   ");
+    Serial.println(hour_now);
+    Serial.print("now.minute: ");
+    Serial.println(min_now);
+    Serial.print("now.second: ");
+    Serial.println(sec_now);
+//    if (set_hour == hour_now and set_min == min_now and set_sec == sec_now) {
+      // call = 1 is checkpoint()
+ //     call = 1;
+  //  }
+    delay(2000);
+    
+  
+    if (hour_chosen == hour_now and min_chosen == min_now and sec_chosen == sec_now){
+      Serial.println("It's been 30 minutes");
+      Serial.println("You made it to the first check point !");
+      RTC.adjust(DateTime(2020,11,3,0,00,00));
+      break;
+  
+    
+    }}}
+
+
+
+
+// -------------packages--------------
+int Packages(int Time_chosen, int slot) {
+  int Package[8];
+  /* START TIME
+  Package[] = { hour_vd_1,     min_vd_1,
+                hour_chp_1,  min_chp_1, //start over
+                hour_vd_2,     min_vd_2,
+                hour_chp_2,  min_chp_2        }
+  */ 
+  if (Time_chosen == 1){
+    Package[0] = 0;
+    Package[1] = 30;
+    Package[2] = 0;
+    Package[3] = 40;
+    Package[4] = 0;
+    Package[5] = 50;
+    Package[6] = 1;
+    Package[7] = 0;
+    }
+  else if (Time_chosen == 2){
+    Package[0] = 0;
+    Package[1] = 40;
+    Package[2] = 1;
+    Package[3] = 0;
+    Package[4] = 1;
+    Package[5] = 20;
+    Package[6] = 1;
+    Package[7] = 40;
+    }
+  else if (Time_chosen == 3){
+    Package[0] = 1;
+    Package[1] = 0;
+    Package[2] = 1;
+    Package[3] = 30;
+    Package[4] = 2;
+    Package[5] = 0;
+    Package[6] = 2;
+    Package[7] = 30;
+    }
+  else if (Time_chosen == 4){
+    Package[0] = 0;
+    Package[1] = 2;
+    Package[2] = 0;
+    Package[3] = 8;
+    Package[4] = 0;
+    Package[5] = 10;
+    Package[6] = 0;
+    Package[7] = 14;
+    }
+
+  return Package[slot];
+
+
+//********************************************************************************************************************//
+// * 5. Music
+
+void PlayMusic(int whichone){ //1=welcome sound, 2= Bearhouse song ,and 3= Chill Song
+  myDFPlayer.play(whichone); 
+}
+
+void PauseMusic(){
+  myDFPlayer.pause(); 
+}
+
+void StartFromPause(){ //In case we want to continue the music from pause
+  myDFPlayer.start(); 
+}
+
+
+
+//********************************************************************************************************************//
+// * 7. Checkpoint game
+
+
+void checkpoint(){
+  int r_game = TrueRandom.random(1,4);
+  Serial.println(r_game);
+  Serial.println("It's time to break");
+  Serial.println("Let's play a mini-game");
+  if(r_game == 1){
+    Crack_code();
+  }
+  if(r_game == 2){
+    swipe();
+  }
+  if(r_game == 3){
+    fill_in_blank();
+}
+}
+void Crack_code(){
+  boolean pass = false;
+  Serial.println("Instructions:");
+  Serial.println("Crack the following code");
+  delay(1000);
+  while (pass != true) {
+    Serial.println(code[0]);
+    Serial.println(pointer[0]);
+    int ans = SelectABCD();
+    if(ans == 1){
+      pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[1]);
+  Serial.println(pointer[1]);
+  while (pass != true) {
+    if(SelectABCD() == answer[1]){
+      pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[2]);
+  Serial.println(pointer[2]);
+  while (pass != true) {
+   if(SelectABCD() == answer[2]){
+     pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[3]);
+  Serial.println(pointer[3]);
+  while (pass != true) {
+   if(SelectABCD() == answer[3]){
+     pass = true;
+  }
+    else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[4]);
+  Serial.println(pointer[4]);
+  while (pass != true) {
+   if(SelectABCD() == answer[4]){
+     pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  while (pass != true) {
+   Serial.println(code[5]);
+   Serial.println(pointer[5]);
+   if(SelectABCD() == answer[5]){
+    pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[6]);
+  Serial.println(pointer[6]);
+  while (pass != true) {
+   
+   if(SelectABCD() == answer[6]){
+    pass = true;
+  }
+  else{
+      Serial.println("Try Again");
+    }
+  }
+  pass = false;
+  Serial.println(code[7]);
+  Serial.println(pointer[7]);
+  while (pass != true) {
+   if(SelectABCD() == answer[7]){
+    pass = true;
+  }
+  else{
+    Serial.println("Try Again");
+  }
+  }
+if (pass == true) {
+  Serial.println("Congratulations! You win!!!");
+}
+  show = 0;
+}
+void swipe(){
+  int check = 0;
+  int check2 = 0;
+  int pass = false;
+  int v_avg;
+  int v_avg2;
+  int v_avg3;
+  int start_dis;
+  int end_dis;
+  int ttime1;
+  int ttime2;
+  int ttime3;
+  int ttime4;
+  int ttime5;
+  int ttime6;
+  //check variable at every point
+  Serial.println("Instructions:");
+  Serial.println("Swipe your hand");
+  Serial.println("From A to D");
+  delay(500);
+  ttime1 = millis();
+  while (quickSelectABCD() != 4) {
+    if(quickSelectABCD() == 1){
+      check = 1;
+  } 
+  }
+  ttime2 = millis();
+  delay(300);
+  v_avg = 30/((ttime2-ttime1)*0.001);
+  //For checking the accuray of the game
+  //Serial.println(ttime1);
+  // Serial.println(ttime2);
+  //Serial.println((v_avg)*10);
+  //Serial.println(check);
+  if(check == 1 and v_avg*10 >= 100){
+    pass = true;
+  }
+  else{
+    check = 0;
+    Serial.println("Try again");
+    }
+  if(pass == true){
+    pass = false ;
+    Serial.println("Great!");
+    delay(500);
+    Serial.println("Level UP >>>");
+    delay(300);
+    Serial.println("Swipe your hand");
+    Serial.println("From A to D");
+    delay(300);
+    Serial.println("Faster");
+    ttime3 = millis();
+    check = 0;
+    while (quickSelectABCD() !=4) {
+    if(quickSelectABCD() == 1){
+      check = 1;
+    } 
+    }
+    ttime4 = millis();
+    v_avg2 = 30/((ttime4-ttime3)*0.001);
+    if(check == 1 and v_avg2*10 >= 120){
+      pass = true;
+  }
+    else {
+      Serial.println("Try again");
+    }
+    if(pass == true){
+      pass = false;
+      Serial.println("Great!");
+      delay(500);
+      Serial.println("Level UP >>>>>>>>>>>>>");
+      delay(300);
+      Serial.println("Last level !!!");
+      Serial.println("Swipe your hand");
+      Serial.println("From A to D");
+      delay(300);
+      Serial.println("More fasterrrrrrrrrrrr");
+      check =0;
+      ttime5 = millis();
+      while (quickSelectABCD() !=4) {
+      if(quickSelectABCD() == 1){
+        check = 1;
+      } 
+      }
+      ttime6 = millis();
+      
+      v_avg3 = 30/((ttime6-ttime5)*0.001);
+      if(check == 1 and v_avg3*10 >= 150){
+         pass = true;
+      }
+      else {
+      Serial.println("Try again");
+    }
+      if(pass == true){
+        pass = false;
+        Serial.println("Congratulations, You are super fast !");
+    }
+      }
+}
+  show = 0;
+}
+void fill_in_blank(){
+   int score = 0;
+   show = 1;
+   Serial.println("Instructions: ");
+   delay(300);
+   Serial.println("Fill in the missing alphabet");
+   delay(300);
+   Serial.println("You have 2 seconds for each puzzle");
+   delay(300);
+   Serial.println("Pin_apple");
+   delay(300);
+   Serial.print("A) i          ");
+   Serial.println("B) e        ");
+   Serial.print("C) t          ");
+   Serial.println("D) d        ");
+  delay(2000);
+  if(SelectABCD() == 2){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Su_ermarket");
+  delay(500);
+  Serial.print("A) f         ");
+  Serial.println("B) p        ");
+  Serial.print("C) s          ");
+  Serial.println("D) b        ");
+delay(2000);
+  if(SelectABCD() == 2){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Billion_ire");
+  delay(500);
+  Serial.print("A) o          ");
+  Serial.println("B) e        ");
+  Serial.print("C) a          ");
+  Serial.println("D) f        ");
+delay(2000);
+  if(SelectABCD() == 3){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Mo_ntain");
+  delay(500);
+  Serial.print("A) e          ");
+  Serial.println("B) a        ");
+  Serial.print("C) u          ");
+  Serial.println("D) o        ");
+  delay(2000);
+  if(SelectABCD() == 3){
+    Serial.println("score +1");
+    score += 1;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("De_tination");
+  delay(500);
+  Serial.print("A) s        ");
+  Serial.println("B) x      ");
+  Serial.print("C) p        ");
+  Serial.println("D) c      ");
+  delay(2000);
+  if(SelectABCD() == 1){
+    Serial.println("score +2");
+    score += 2;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Bonus one!");
+  delay(300);
+  Serial.println("E_gen va_ues");
+  delay(500);
+  Serial.print("A) u,g        ");
+  Serial.println("B) t,l      ");
+  Serial.print("C) r,n        ");
+  Serial.println("D) i,l      ");
+  delay(2000);
+  if(SelectABCD() == 4){
+    Serial.println("score +3");
+    score += 3;
+  }
+  else {
+    Serial.println("Incorrect");
+  }
+  Serial.println("Your score is ");
+  Serial.println(score); 
+  score = 0;
+  show = 0;
+ }
+
+
+
+*/
+
+//********************************************************************************************************************//
+//--------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------Main----------------------------------------------------------//
+//--------------------------------------------------------------------------------------------------------------------//
+//********************************************************************************************************************//
+
+
+
+
+void loop() {
+
+Serial.println(F("Start loop"));
+  // * 1. detect chair
+  int activate = Chair_det(ChairDet_trigPin, ChairDet_echoPin);
+  // * 2. turn on light
+    //  Light_on();
+
+  // * 3. Welcome massage+ Time selection
+//  PlayMusic(1);
+  int Time_chosen = Welcome();
+
+  int hour_chosen;
+  int min_chosen;
+  int sec_chosen;
+
+  if (Time_chosen != 4){
+    hour_chosen = Time_chosen;
+    min_chosen = 0;
+    sec_chosen = 0;
+  } 
+  else{
+    hour_chosen = 0;
+    min_chosen = 10;
+    sec_chosen = 0;
+  }
+
+  /*
+  // * Music
+  display.setCursor(0, 0);
+  display.println(F("Do you want some music?"));
+  display.display();
+  delay(1000);
+  display.println(F("A) yes"));
+  display.println(F("C) no"));
+  display.display();
+  delay(500);
+  int ans = SelectYN();
+  if (ans == 1){
+    PlayMusic(2);
+  }
+  delay(3000);
+  */
+  
+  // * 4. Timer
+  timer(hour_chosen, min_chosen, sec_chosen);
+  
+  // *Check point
+  delay(1000);
+  display.println(F("Let's play a mini-game"));
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  display.println(F("It's time to break"));
+  display.println(F("Let's play a mini-game"));
+  delay(2000);
+//  checkpoint();
+  
+}
+
+
+
+
+
+
+
+//********************************************************************************************************************//
+// * 2. Confirmation Light (Light_on/Light_off) (Ultrasonic_Onthetable)(AC light dimmer)
+
+
+//********************************************************************************************************************//
+// * 3. Welcome sentence (OLED display)
+
+
+
+
+
+
+
