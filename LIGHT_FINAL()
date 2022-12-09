@@ -1,0 +1,76 @@
+#include <RBDdimmer.h>
+
+//#define USE_SERIAL  SerialUSB //Serial for boards whith USB serial port
+#define USE_SERIAL  Serial
+#define outputPin  6 
+#define zerocross  1 // for boards with CHANGEBLE input pins
+
+//dimmerLamp dimmer(outputPin, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
+dimmerLamp dimmer(outputPin); //initialase port for dimmer for MEGA, Leonardo, UNO, Arduino M0, Arduino Zero
+int set = 0;
+int Intensity = 100;
+const int trigPin = 13;
+const int echoPin = 12;
+void setup() {
+  USE_SERIAL.begin(9600);
+  dimmer.begin(NORMAL_MODE, ON); //dimmer initialisation: name.begin(MODE, STATE) 
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  Serial.begin(9600);
+}
+
+void light_on() 
+{
+    Intensity = 100; ; // analogRead(analog_pin), min_analog, max_analog, 100%, 0%);
+    USE_SERIAL.println(Intensity); 
+    dimmer.setPower(Intensity); // 100%
+}
+
+void light_off() 
+{
+    Intensity = 30; // analogRead(analog_pin), min_analog, max_analog, 100%, 0%);
+    USE_SERIAL.println(Intensity); 
+    dimmer.setPower(Intensity); // 100%
+}
+
+
+
+void loop() {
+//  long duration, distance, newdistance;
+//  long tempo;
+//  long limit = 30;
+//  digitalWrite(trigPin, LOW);
+//  delayMicroseconds(2);
+//  digitalWrite(trigPin, HIGH);
+//  delayMicroseconds(10);
+//  digitalWrite(trigPin, LOW);
+//  duration = pulseIn(echoPin, HIGH);
+//  distance = (duration/2) / 29.41;
+//  while (true){
+//    tempo = distance;
+//    Serial.print(tempo);
+//    Serial.println("tempo cm");
+//    delay(500);
+//    digitalWrite(trigPin, LOW);
+//    delayMicroseconds(2);
+//    digitalWrite(trigPin, HIGH);
+//    delayMicroseconds(10);
+//    digitalWrite(trigPin, LOW);
+//    duration = pulseIn(echoPin, HIGH);
+//    newdistance = (duration/2) / 29.41;
+//    Serial.print(newdistance);
+//    Serial.println("new cm");
+//    
+//    if (abs(newdistance-tempo) > limit){
+//      Serial.println("Activate");
+//      set = 1;
+//      delay(5000);
+//      light_on();
+//      break;
+//    }
+//   }
+//   Serial.println("----------");
+
+light_on() ;
+    
+}
